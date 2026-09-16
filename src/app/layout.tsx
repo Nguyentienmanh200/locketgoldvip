@@ -13,26 +13,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Locket Gold | Premium Digital Store",
-  description:
-    "Hệ thống bán & kích hoạt Locket Gold bảo mật cao cấp. Đăng ký CTV, quản lý đơn hàng, thanh toán tự động.",
-  keywords: ["Locket Gold", "CTV", "digital store", "Zalo bot"],
+  title: "Locket Gold VIP",
+  description: "Hệ thống bán & kích hoạt Locket Gold · Zalo Bot · CTV",
   robots: "noindex, nofollow",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="vi"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-mesh text-slate-100">
-        {children}
-      </body>
+    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
+      <body className="min-h-full antialiased">{children}</body>
     </html>
   );
 }

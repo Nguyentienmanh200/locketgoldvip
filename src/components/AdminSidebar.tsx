@@ -3,37 +3,33 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navItems = [
-  { href: "/admin", label: "Tổng quan", icon: "📊" },
-  { href: "/admin/orders", label: "Đơn hàng", icon: "🛒" },
-  { href: "/admin/products", label: "Sản phẩm", icon: "📦" },
-  { href: "/admin/users", label: "Người dùng", icon: "👥" },
-  { href: "/admin/ctv", label: "CTV & Duyệt", icon: "🤝" },
-  { href: "/admin/discounts", label: "Mã giảm giá", icon: "🏷️" },
-  { href: "/admin/settings", label: "Cài đặt", icon: "⚙️" },
+const items = [
+  { href: "/admin", label: "Tổng quan", icon: "◈" },
+  { href: "/admin/orders", label: "Đơn hàng", icon: "☰" },
+  { href: "/admin/products", label: "Sản phẩm", icon: "◇" },
+  { href: "/admin/users", label: "Người dùng", icon: "◎" },
+  { href: "/admin/ctv", label: "CTV", icon: "◉" },
+  { href: "/admin/discounts", label: "Mã giảm giá", icon: "▣" },
+  { href: "/admin/settings", label: "Cài đặt", icon: "⚙" },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-64 glass-strong border-r border-slate-800/60 z-40 flex flex-col">
-      {/* Logo */}
-      <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-800/60">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/20">
-          <span className="text-sm font-black text-slate-900">LG</span>
+    <aside className="fixed left-0 top-0 bottom-0 w-56 border-r border-[var(--border)] bg-[var(--bg-elevated)] flex flex-col z-40">
+      <div className="h-14 flex items-center gap-2.5 px-4 border-b border-[var(--border)]">
+        <div className="w-7 h-7 rounded-md bg-[var(--accent)] flex items-center justify-center">
+          <span className="text-xs font-bold text-black">LG</span>
         </div>
         <div>
-          <div className="text-sm font-bold text-white">Locket Gold</div>
-          <div className="text-[10px] text-amber-500/80 font-medium tracking-wider uppercase">
-            Admin Panel
-          </div>
+          <div className="text-sm font-semibold leading-tight">Locket Gold</div>
+          <div className="text-[10px] text-[var(--text-muted)]">Admin</div>
         </div>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
+      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+        {items.map((item) => {
           const active =
             item.href === "/admin"
               ? pathname === "/admin"
@@ -42,33 +38,22 @@ export default function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                active
-                  ? "nav-active text-amber-400"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
-              }`}
+              className={`nav-item ${active ? "active" : ""}`}
             >
-              <span className="text-base">{item.icon}</span>
+              <span className="w-5 text-center text-xs opacity-70">{item.icon}</span>
               {item.label}
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-slate-800/60">
-        <Link
-          href="/"
-          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-500 hover:text-slate-300 hover:bg-slate-800/40 transition"
-        >
-          ← Về trang chủ
+      <div className="p-3 border-t border-[var(--border)] space-y-1">
+        <Link href="/" className="nav-item text-xs">
+          ← Trang chủ
         </Link>
         <button
-          onClick={() => {
-            // TODO: real logout
-            window.location.href = "/login";
-          }}
-          className="w-full mt-2 flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition"
+          onClick={() => (window.location.href = "/login")}
+          className="nav-item w-full text-left text-xs text-red-400/80 hover:text-red-400"
         >
           Đăng xuất
         </button>

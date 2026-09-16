@@ -1,12 +1,12 @@
 export default function UsersPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-white">Người dùng</h1>
-        <p className="text-sm text-slate-400 mt-1">Quản lý tài khoản user & ví</p>
+        <h1 className="text-xl font-semibold">Người dùng</h1>
+        <p className="text-sm text-[var(--text-secondary)] mt-0.5">Quản lý tài khoản & ví</p>
       </div>
-      <div className="glass rounded-2xl p-12 text-center text-slate-500 text-sm">
-        Trang quản lý user đang được hoàn thiện (CRUD + balance + role).
+      <div className="card p-10 text-center text-sm text-[var(--text-muted)]">
+        Trang user đang được kết nối database. Sẽ hiển thị danh sách user, số dư, role (user/ctv/admin).
       </div>
     </div>
   );

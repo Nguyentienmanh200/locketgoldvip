@@ -17,28 +17,23 @@ export default function RegisterCtvPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
     if (form.password !== form.confirmPassword) {
       setError("Mật khẩu xác nhận không khớp");
       return;
     }
     if (form.password.length < 8) {
-      setError("Mật khẩu phải có ít nhất 8 ký tự");
+      setError("Mật khẩu tối thiểu 8 ký tự");
       return;
     }
-
     setLoading(true);
-    // TODO: call real API /api/ctv/register
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((r) => setTimeout(r, 900));
     setSuccess(true);
     setLoading(false);
   };
@@ -46,21 +41,15 @@ export default function RegisterCtvPage() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="glass-strong rounded-3xl p-10 max-w-md w-full text-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-6">
-            <span className="text-3xl">✓</span>
+        <div className="card p-8 max-w-md w-full text-center">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center mx-auto mb-4 text-emerald-400 text-xl">
+            ✓
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3">
-            Đăng ký thành công!
-          </h2>
-          <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-            Yêu cầu CTV của bạn đã được gửi. Admin sẽ duyệt trong thời gian sớm
-            nhất. Bạn sẽ nhận thông báo qua Zalo khi được phê duyệt.
+          <h2 className="text-lg font-semibold mb-2">Đã gửi yêu cầu</h2>
+          <p className="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">
+            Admin sẽ duyệt trong thời gian sớm nhất. Bạn sẽ được thông báo qua Zalo khi được phê duyệt.
           </p>
-          <Link
-            href="/"
-            className="btn-gold inline-flex px-8 py-3 rounded-xl text-sm font-bold"
-          >
+          <Link href="/" className="btn btn-primary">
             Về trang chủ
           </Link>
         </div>
@@ -70,160 +59,72 @@ export default function RegisterCtvPage() {
 
   return (
     <div className="min-h-screen py-12 px-4">
-      <div className="max-w-xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
-              <span className="text-lg font-black text-slate-900">LG</span>
+      <div className="max-w-lg mx-auto">
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2">
+            <div className="w-9 h-9 rounded-lg bg-[var(--accent)] flex items-center justify-center">
+              <span className="text-sm font-bold text-black">LG</span>
             </div>
           </Link>
-          <h1 className="mt-5 text-3xl font-bold text-white">
-            Đăng ký{" "}
-            <span className="text-gold-gradient">Cộng tác viên</span>
-          </h1>
-          <p className="mt-2 text-slate-400 text-sm">
-            Điền thông tin để trở thành CTV của Locket Gold
+          <h1 className="mt-4 text-xl font-semibold">Đăng ký CTV</h1>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            Trở thành cộng tác viên Locket Gold VIP
           </p>
         </div>
 
-        {/* Form Card */}
-        <div className="glass-strong rounded-3xl p-8 shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center font-medium">
-                {error}
-              </div>
-            )}
-
-            <div className="grid sm:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                  Tên đăng nhập *
-                </label>
-                <input
-                  name="username"
-                  value={form.username}
-                  onChange={handleChange}
-                  required
-                  minLength={3}
-                  placeholder="username"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-600 text-sm input-gold transition"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                  Tên hiển thị *
-                </label>
-                <input
-                  name="displayName"
-                  value={form.displayName}
-                  onChange={handleChange}
-                  required
-                  placeholder="Nguyễn Văn A"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-600 text-sm input-gold transition"
-                />
-              </div>
+        <form onSubmit={handleSubmit} className="card p-6 space-y-4">
+          {error && (
+            <div className="px-3 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+              {error}
             </div>
+          )}
 
-            <div className="grid sm:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                  Mật khẩu *
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                  minLength={8}
-                  placeholder="Tối thiểu 8 ký tự"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-600 text-sm input-gold transition"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                  Xác nhận mật khẩu *
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  placeholder="Nhập lại mật khẩu"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-600 text-sm input-gold transition"
-                />
-              </div>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                  Zalo ID / Link *
-                </label>
-                <input
-                  name="zaloId"
-                  value={form.zaloId}
-                  onChange={handleChange}
-                  required
-                  placeholder="zalo.me/xxx hoặc ID"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-600 text-sm input-gold transition"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                  Số điện thoại
-                </label>
-                <input
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                  placeholder="09xx xxx xxx"
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-600 text-sm input-gold transition"
-                />
-              </div>
-            </div>
-
+          <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                Lý do muốn trở thành CTV
-              </label>
-              <textarea
-                name="reason"
-                value={form.reason}
-                onChange={handleChange}
-                rows={3}
-                placeholder="Giới thiệu ngắn về bản thân / kinh nghiệm..."
-                className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-600 text-sm input-gold transition resize-none"
-              />
+              <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Tên đăng nhập *</label>
+              <input name="username" value={form.username} onChange={onChange} required minLength={3} className="input" placeholder="username" />
             </div>
+            <div>
+              <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Tên hiển thị *</label>
+              <input name="displayName" value={form.displayName} onChange={onChange} required className="input" placeholder="Nguyễn Văn A" />
+            </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-gold w-full py-3.5 rounded-xl text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed mt-2"
-            >
-              {loading ? "Đang gửi yêu cầu..." : "Gửi yêu cầu đăng ký CTV"}
-            </button>
-          </form>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Mật khẩu *</label>
+              <input type="password" name="password" value={form.password} onChange={onChange} required minLength={8} className="input" placeholder="Tối thiểu 8 ký tự" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Xác nhận MK *</label>
+              <input type="password" name="confirmPassword" value={form.confirmPassword} onChange={onChange} required className="input" placeholder="Nhập lại" />
+            </div>
+          </div>
 
-          <p className="mt-6 text-center text-xs text-slate-500">
-            Đã có tài khoản?{" "}
-            <Link
-              href="/login"
-              className="text-amber-400 hover:text-amber-300 font-medium"
-            >
-              Đăng nhập
-            </Link>
-          </p>
-        </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Zalo ID / Link *</label>
+              <input name="zaloId" value={form.zaloId} onChange={onChange} required className="input" placeholder="zalo.me/xxx" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Số điện thoại</label>
+              <input name="phone" value={form.phone} onChange={onChange} className="input" placeholder="09xx xxx xxx" />
+            </div>
+          </div>
 
-        <p className="mt-6 text-center text-xs text-slate-600">
-          <Link href="/" className="hover:text-slate-400 transition">
-            ← Quay lại trang chủ
-          </Link>
+          <div>
+            <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Lý do muốn làm CTV</label>
+            <textarea name="reason" value={form.reason} onChange={onChange} rows={3} className="input resize-none" placeholder="Kinh nghiệm, nguồn khách..." />
+          </div>
+
+          <button type="submit" disabled={loading} className="btn btn-primary w-full">
+            {loading ? "Đang gửi..." : "Gửi yêu cầu đăng ký"}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
+          Đã có tài khoản?{" "}
+          <Link href="/login" className="text-[var(--accent)] hover:underline">Đăng nhập</Link>
         </p>
       </div>
     </div>

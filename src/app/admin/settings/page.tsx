@@ -1,14 +1,41 @@
 export default function SettingsPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-white">Cài đặt hệ thống</h1>
-        <p className="text-sm text-slate-400 mt-1">Zalo Bot, Sepay, Bank, Locket API, bảo mật</p>
+        <h1 className="text-xl font-semibold">Cài đặt hệ thống</h1>
+        <p className="text-sm text-[var(--text-secondary)] mt-0.5">Zalo Bot · Sepay · Bank · Locket API</p>
       </div>
-      <div className="glass rounded-2xl p-12 text-center text-slate-500 text-sm">
-        Trang settings (API keys, bank info, admin password...) đang được hoàn thiện.
-        <br />
-        Secrets sẽ chỉ lưu qua Environment Variables trên Vercel.
+
+      <div className="grid gap-4 max-w-2xl">
+        <div className="card p-5 space-y-3">
+          <h3 className="text-sm font-medium">Zalo Bot</h3>
+          <p className="text-xs text-[var(--text-muted)]">
+            Webhook URL (dán vào Zalo OA):
+          </p>
+          <code className="block text-xs bg-[var(--bg)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-[var(--accent)] break-all">
+            https://locketgoldvip-nine.vercel.app/api/zalo/webhook
+          </code>
+          <p className="text-xs text-[var(--text-secondary)]">
+            Cần điền <strong>ZALO_BOT_TOKEN</strong> và <strong>ZALO_SECRET_TOKEN</strong> vào Environment Variables trên Vercel.
+          </p>
+        </div>
+
+        <div className="card p-5 space-y-3">
+          <h3 className="text-sm font-medium">Sepay / Ngân hàng</h3>
+          <p className="text-xs text-[var(--text-secondary)]">
+            Webhook thanh toán: <code className="text-[var(--accent)]">/api/sepay/webhook</code>
+          </p>
+          <p className="text-xs text-[var(--text-muted)]">
+            Điền SEPAY_API_KEY, BANK_ACCOUNT, BANK_OWNER trên Vercel Env.
+          </p>
+        </div>
+
+        <div className="card p-5 space-y-3">
+          <h3 className="text-sm font-medium">Locket API</h3>
+          <p className="text-xs text-[var(--text-muted)]">
+            LOCKET_API_BASE_URL + LOCKET_API_KEY để kích hoạt Gold tự động sau thanh toán.
+          </p>
+        </div>
       </div>
     </div>
   );
