@@ -254,7 +254,7 @@ export async function updateProduct(id: string, field: string, value: unknown) {
   const list = await getAllProducts();
   const i = list.findIndex((p) => p.id === id);
   if (i < 0) return false;
-  (list[i] as Record<string, unknown>)[field] = value;
+  (list[i] as unknown as Record<string, unknown>)[field] = value;
   await saveProducts(list);
   return true;
 }
