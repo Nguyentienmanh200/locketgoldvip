@@ -28,31 +28,31 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Tổng quan</h1>
+        <h1 className="text-lg sm:text-xl font-semibold">Tổng quan</h1>
         <p className="text-sm text-[var(--text-secondary)] mt-0.5">Thống kê hoạt động hệ thống</p>
       </div>
 
-      <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((s) => (
-          <div key={s.label} className="card p-4">
-            <p className="text-xs text-[var(--text-muted)]">{s.label}</p>
-            <p className="text-2xl font-semibold mt-1.5 tracking-tight">{s.value}</p>
-            <p className="text-xs text-[var(--text-secondary)] mt-1">{s.sub}</p>
+          <div key={s.label} className="card p-3 sm:p-4 min-w-0">
+            <p className="text-[11px] sm:text-xs text-[var(--text-muted)] truncate">{s.label}</p>
+            <p className="text-lg sm:text-2xl font-semibold mt-1 tracking-tight truncate">{s.value}</p>
+            <p className="text-[11px] sm:text-xs text-[var(--text-secondary)] mt-1 truncate">{s.sub}</p>
           </div>
         ))}
       </div>
 
-      <div className="card">
-        <div className="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between">
-          <h2 className="text-sm font-medium">Đơn hàng gần đây</h2>
-          <a href="/admin/orders" className="text-xs text-[var(--accent)] hover:underline">
+      <div className="card overflow-hidden">
+        <div className="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between gap-2">
+          <h2 className="text-sm font-medium truncate">Đơn hàng gần đây</h2>
+          <a href="/admin/orders" className="text-xs text-[var(--accent)] hover:underline shrink-0">
             Xem tất cả
           </a>
         </div>
         <div className="table-wrap">
-          <table className="data">
+          <table className="data min-w-[560px]">
             <thead>
               <tr>
                 <th>Mã đơn</th>
@@ -65,10 +65,10 @@ export default function AdminDashboard() {
             <tbody>
               {orders.map((o) => (
                 <tr key={o.id}>
-                  <td className="font-mono text-xs text-[var(--accent)]">{o.id}</td>
-                  <td>{o.user}</td>
-                  <td>{o.product}</td>
-                  <td className="text-[var(--text)] font-medium">{o.amount}</td>
+                  <td className="font-mono text-xs text-[var(--accent)] whitespace-nowrap">{o.id}</td>
+                  <td className="whitespace-nowrap">{o.user}</td>
+                  <td className="whitespace-nowrap">{o.product}</td>
+                  <td className="text-[var(--text)] font-medium whitespace-nowrap">{o.amount}</td>
                   <td>
                     <span className={`badge ${statusMap[o.status]}`}>
                       {statusLabel[o.status]}

@@ -16,12 +16,12 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">Đơn hàng</h1>
+          <h1 className="text-lg sm:text-xl font-semibold">Đơn hàng</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-0.5">Quản lý toàn bộ đơn hàng</p>
         </div>
-        <button className="btn btn-primary text-sm">+ Tạo đơn thủ công</button>
+        <button className="btn btn-primary text-sm w-full sm:w-auto">+ Tạo đơn thủ công</button>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -32,9 +32,9 @@ export default function OrdersPage() {
         ))}
       </div>
 
-      <div className="card">
+      <div className="card overflow-hidden">
         <div className="table-wrap">
-          <table className="data">
+          <table className="data min-w-[640px]">
             <thead>
               <tr>
                 <th>Mã đơn</th><th>User</th><th>Sản phẩm</th><th>SL</th><th>Số tiền</th><th>Trạng thái</th><th>Thời gian</th><th></th>
@@ -43,13 +43,13 @@ export default function OrdersPage() {
             <tbody>
               {orders.map((o) => (
                 <tr key={o.id}>
-                  <td className="font-mono text-xs text-[var(--accent)]">{o.id}</td>
-                  <td>{o.user}</td>
-                  <td>{o.product}</td>
+                  <td className="font-mono text-xs text-[var(--accent)] whitespace-nowrap">{o.id}</td>
+                  <td className="whitespace-nowrap">{o.user}</td>
+                  <td className="whitespace-nowrap">{o.product}</td>
                   <td>{o.qty}</td>
-                  <td className="text-[var(--text)] font-medium">{o.amount.toLocaleString("vi-VN")}đ</td>
+                  <td className="text-[var(--text)] font-medium whitespace-nowrap">{o.amount.toLocaleString("vi-VN")}đ</td>
                   <td><span className={`badge ${map[o.status]}`}>{label[o.status]}</span></td>
-                  <td className="text-xs">{o.time}</td>
+                  <td className="text-xs whitespace-nowrap">{o.time}</td>
                   <td><button className="text-xs text-[var(--accent)] hover:underline">Chi tiết</button></td>
                 </tr>
               ))}
