@@ -43,9 +43,9 @@ const DEFAULT_SETTINGS: Settings = {
 
 const DEFAULT_PRODUCTS: Product[] = [
   { id: "locket_gold_1month", name: "Locket Gold 1 Tháng", price: 45000, stock: 100, api_order_enabled: true, isGold: true, description: "Locket Gold 30 ngày" },
-  { id: "locket_gold_3month", isGold: true, name: "Locket Gold 3 Tháng", price: 120000, stock: 80, api_order_enabled: true, isGold: true },
-  { id: "locket_gold_6month", isGold: true, name: "Locket Gold 6 Tháng", price: 220000, stock: 40, api_order_enabled: true, isGold: true },
-  { id: "locket_gold_1year", isGold: true, name: "Locket Gold 1 Năm", price: 380000, stock: 20, api_order_enabled: true, isGold: true },
+  { id: "locket_gold_3month", name: "Locket Gold 3 Tháng", price: 120000, stock: 80, api_order_enabled: true, isGold: true },
+  { id: "locket_gold_6month", name: "Locket Gold 6 Tháng", price: 220000, stock: 40, api_order_enabled: true, isGold: true },
+  { id: "locket_gold_1year", name: "Locket Gold 1 Năm", price: 380000, stock: 20, api_order_enabled: true, isGold: true },
 ];
 
 async function ghHeaders() {
