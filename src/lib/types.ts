@@ -7,6 +7,7 @@ export interface User {
   zaloId?: string;
   telegramId?: string;
   telegramUsername?: string;
+  passwordHash?: string;
   walletBalance: number;
   role: Role;
   createdAt: string;
@@ -76,7 +77,6 @@ export interface CtvPrice {
 export interface CtvApplication {
   id: string;
   username: string;
-  passwordHash?: string;
   displayName: string;
   zaloId: string;
   phone?: string;
