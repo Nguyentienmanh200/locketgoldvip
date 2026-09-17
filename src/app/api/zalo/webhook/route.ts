@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import {
   getOrCreateUserByZalo,
@@ -22,12 +24,9 @@ import {
   getSettings,
   updateSetting,
   getUserByUsername,
-  getAllUsers,
   updateUser,
-  setCtvPrice,
-  getCtvPrice,
 } from "@/lib/store";
-import { callLocketApi, checkGoldLive, getCtvInfo, callOrderApi } from "@/lib/locket";
+import { callLocketApi, checkGoldLive, callOrderApi } from "@/lib/locket";
 import { generateVietQR, getBankInfo } from "@/lib/bank";
 import { sendZaloMessage, sendZaloImage, formatMoney } from "@/lib/zalo";
 import type { User } from "@/lib/types";

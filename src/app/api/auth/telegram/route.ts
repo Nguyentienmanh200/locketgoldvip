@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import { verifyTelegramAuth, getTelegramBotUsername } from "@/lib/telegram";
 import { getOrCreateUserByTelegram } from "@/lib/store";
