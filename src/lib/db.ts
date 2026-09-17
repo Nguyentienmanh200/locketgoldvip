@@ -42,10 +42,10 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 const DEFAULT_PRODUCTS: Product[] = [
-  { id: "locket_gold_1month", name: "Locket Gold 1 Tháng", price: 45000, stock: 100, api_order_enabled: true, description: "Locket Gold 30 ngày" },
-  { id: "locket_gold_3month", name: "Locket Gold 3 Tháng", price: 120000, stock: 80, api_order_enabled: true },
-  { id: "locket_gold_6month", name: "Locket Gold 6 Tháng", price: 220000, stock: 40, api_order_enabled: true },
-  { id: "locket_gold_1year", name: "Locket Gold 1 Năm", price: 380000, stock: 20, api_order_enabled: true },
+  { id: "locket_gold_1month", name: "Locket Gold 1 Tháng", price: 45000, stock: 100, api_order_enabled: true, isGold: true, description: "Locket Gold 30 ngày" },
+  { id: "locket_gold_3month", isGold: true, name: "Locket Gold 3 Tháng", price: 120000, stock: 80, api_order_enabled: true, isGold: true },
+  { id: "locket_gold_6month", isGold: true, name: "Locket Gold 6 Tháng", price: 220000, stock: 40, api_order_enabled: true, isGold: true },
+  { id: "locket_gold_1year", isGold: true, name: "Locket Gold 1 Năm", price: 380000, stock: 20, api_order_enabled: true, isGold: true },
 ];
 
 async function ghHeaders() {
@@ -290,12 +290,19 @@ export async function setCtvPrice(userId: number, productId: string, price: numb
 export async function getProductEffectivePrice(productId: string, user: User | null) {
   const product = await getProductById(productId);
   if (!product) return 0;
-  let price = product.price;
-  if (user && (user.role === "ctv" || user.role === "admin")) {
-    const ctv = await getCtvPrice(user.id, productId);
-    if (ctv !== null) price = ctv;
+  // 1) Giá riêng từng user (customPrices) — như Firebase gốc
+  if (user?.customPrices) {
+    const key = String(productId);
+    if (user.customPrices[key] != null) return Number(user.customPrices[key]);
+    if (user.customPrices[productId] != null) return Number(user.customPrices[productId]);
   }
-  return price;
+  // 2) Bảng giá CTV theo userId+product
+  if (user && (user.role === "ctv" || user.role === "agent" || user.role === "admin")) {
+    const ctv = await getCtvPrice(user.id, productId);
+    if (ctv !== null) return ctv;
+    if (product.ctvPrice != null) return Number(product.ctvPrice);
+  }
+  return product.price;
 }
 
 // ---------- Orders ----------

@@ -1,4 +1,4 @@
-export type Role = "user" | "ctv" | "admin";
+export type Role = "user" | "ctv" | "agent" | "admin";
 
 export interface User {
   id: number;
@@ -8,6 +8,7 @@ export interface User {
   telegramId?: string;
   telegramUsername?: string;
   passwordHash?: string;
+  customPrices?: Record<string, number>;
   walletBalance: number;
   role: Role;
   createdAt: string;
@@ -22,6 +23,8 @@ export interface Product {
   api_order_enabled?: boolean;
   api_url?: string;
   api_key?: string;
+  isGold?: boolean;
+  ctvPrice?: number;
   createdAt?: string;
 }
 

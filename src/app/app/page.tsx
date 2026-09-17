@@ -210,16 +210,24 @@ export default function CustomerApp() {
   const doCheckGold = async () => {
     if (!checkUser.trim()) return;
     setCheckResult("Đang kiểm tra...");
+    // Proxy locketuser.com — cơ chế giống index gốc
     const res = await fetch(
-      `/api/customer?action=check_gold&user=${encodeURIComponent(checkUser.trim())}`
+      `/api/customer/check?u=${encodeURIComponent(checkUser.trim())}`
     );
     const data = await res.json();
-    if (data.success) {
+    if (data.success || data.username || data.name) {
+      const goldStatus =
+        data.gold_status ||
+        data.status_gold ||
+        (data.is_gold || data.isGold ? "ĐÃ CÓ GOLD" : "CHƯA CÓ GOLD");
+      const name = data.name || data.fullname || data.displayName || "";
+      const uname = data.username || checkUser.trim();
+      const uid = data.uid || data.user_id || "";
       setCheckResult(
-        `${data.username} · ${data.displayName || ""}\nGold: ${data.isGold ? "✅ Có" : "❌ Không"}`
+        `${name ? name + " · " : ""}@${uname}\n${goldStatus}${uid ? "\nUID: " + uid : ""}`
       );
     } else {
-      setCheckResult(data.error || "Không kiểm tra được");
+      setCheckResult(data.message || data.error || "Không kiểm tra được");
     }
   };
 

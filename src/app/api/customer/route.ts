@@ -59,15 +59,26 @@ export async function GET(req: NextRequest) {
   if (action === "qr") {
     if (!user) return NextResponse.json({ error: "login required" }, { status: 401 });
     const amount = Number(req.nextUrl.searchParams.get("amount") || 50000);
-    const content = `NAP ${user.username}`;
+    const content = `NAP ${user.telegramId || user.username}`;
     const qr = await generateVietQR(Math.max(10000, amount), content);
     const bank = await getBankInfo();
     return NextResponse.json({ qr, bank, content, amount: Math.max(10000, amount) });
   }
 
   if (action === "check_gold") {
+    // Ưu tiên proxy locketuser.com (giống site gốc)
     const username = req.nextUrl.searchParams.get("user") || "";
     if (!username) return NextResponse.json({ error: "missing user" }, { status: 400 });
+    try {
+      const r = await fetch(
+        `${req.nextUrl.origin}/api/customer/check?u=${encodeURIComponent(username)}`,
+        { cache: "no-store" }
+      );
+      const data = await r.json();
+      if (data && (data.success !== undefined || data.username || data.name)) {
+        return NextResponse.json(data);
+      }
+    } catch { /* fallback */ }
     const info = await checkGoldLive(username);
     return NextResponse.json(info);
   }
@@ -84,7 +95,10 @@ export async function POST(req: NextRequest) {
 
   if (action === "buy") {
     const productId = String(body.productId || "");
-    const customerInput = String(body.customerInput || body.locketUser || "").trim();
+    let customerInput = String(body.customerInput || body.locketUser || "").trim();
+    // Parse link locket.cam/@user như site gốc
+    const um = customerInput.match(/(?:locket\.cam\/|@)([a-zA-Z0-9_]+)/i);
+    if (um) customerInput = um[1];
     const qty = Math.max(1, Number(body.qty) || 1);
     const discountCode = body.discountCode ? String(body.discountCode) : null;
 
@@ -183,10 +197,23 @@ export async function POST(req: NextRequest) {
     const fresh = await getUserById(user.id);
     return NextResponse.json({
       ok: true,
+      success: true,
       orderId,
       total,
       balance: fresh?.walletBalance ?? newBal,
-      message: activateMsg,
+      message: activateMsg || "Đặt hàng thành công",
+      bill: {
+        statusHeader: "Đơn hàng đã được xác nhận",
+        orderId,
+        contentCK: "LK" + String(orderId).replace(/^LD/, "").replace(/^ORD-/, ""),
+        createdAt: new Date().toLocaleString("vi-VN"),
+        productName: product.name,
+        qty,
+        total,
+        unitPrice: unitPrice,
+        customerInput,
+        footerMsg: activateMsg || "Đơn hàng đang xử lý / đã ghi nhận",
+      },
     });
   }
 
