@@ -302,11 +302,11 @@ export async function createOrder(
 ): Promise<Order> {
   const orders = await getAllOrders();
   const order: Order = {
-    qty: 1,
-    discountAmount: 0,
-    status: "pending",
-    createdAt: new Date().toISOString(),
     ...data,
+    qty: data.qty ?? 1,
+    discountAmount: data.discountAmount ?? 0,
+    status: data.status ?? "pending",
+    createdAt: data.createdAt ?? new Date().toISOString(),
   } as Order;
   orders.unshift(order);
   await writeJson("orders.json", orders);
