@@ -15,8 +15,8 @@ export default function HomePage() {
             </span>
           </Link>
           <div className="flex items-center gap-2 shrink-0">
-            <Link href="/customer" className="btn btn-ghost text-sm px-3 py-2 hidden sm:inline-flex">
-              Khách hàng
+            <Link href="/app" className="btn btn-ghost text-sm px-3 py-2 hidden sm:inline-flex">
+              Vào App
             </Link>
             <Link href="/login" className="btn btn-ghost text-sm px-3 py-2">
               Admin
