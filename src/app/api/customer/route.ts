@@ -2,52 +2,63 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import {
-  getAllProducts,
-  getProductById,
-  getProductEffectivePrice,
-  getUserById,
-  getOrdersByUserId,
-  createOrder,
-  generateOrderId,
-  changeProductStock,
-  updateUserBalance,
-  addTransaction,
-  getDiscount,
-  useDiscount,
-  updateOrderStatus,
-  addBalance,
-} from "@/lib/store";
-import { callLocketApi, checkGoldLive, callOrderApi } from "@/lib/locket";
+  fbGetUser,
+  fbGetProducts,
+  fbGetProduct,
+  fbGetOrders,
+  fbCreateOrder,
+  fbUpdateUser,
+  fbGetDiscount,
+} from "@/lib/firebase";
+import { callLocketApi } from "@/lib/locket";
 import { generateVietQR, getBankInfo } from "@/lib/bank";
 
-async function getSessionUser(req: NextRequest) {
+async function sessionUser(req: NextRequest) {
   const cookie = req.cookies.get("lg_customer")?.value;
   if (!cookie) return null;
   try {
     const sess = JSON.parse(cookie);
-    return getUserById(sess.userId);
+    return fbGetUser(String(sess.telegramId));
   } catch {
     return null;
   }
 }
 
+function displayPrice(
+  product: { id: string; price: number; ctvPrice?: number },
+  user: { role?: string; customPrices?: Record<string, number> } | null
+) {
+  if (user?.customPrices) {
+    const k = String(product.id);
+    if (user.customPrices[k] != null) return Number(user.customPrices[k]);
+  }
+  if (
+    user &&
+    (user.role === "ctv" || user.role === "agent" || user.role === "admin") &&
+    product.ctvPrice != null
+  ) {
+    return Number(product.ctvPrice);
+  }
+  return Number(product.price) || 0;
+}
+
 export async function GET(req: NextRequest) {
   const action = req.nextUrl.searchParams.get("action") || "products";
-  const user = await getSessionUser(req);
+  const user = await sessionUser(req);
 
   if (action === "products") {
-    const products = await getAllProducts();
-    const list = [];
-    for (const p of products) {
-      const price = await getProductEffectivePrice(p.id, user);
-      list.push({ ...p, price });
-    }
+    const products = await fbGetProducts();
+    const list = products.map((p) => ({
+      ...p,
+      price: displayPrice(p, user),
+      originalPrice: p.price,
+    }));
     return NextResponse.json({ products: list });
   }
 
   if (action === "orders") {
-    if (!user) return NextResponse.json({ error: "login required" }, { status: 401 });
-    const orders = await getOrdersByUserId(user.id);
+    if (!user) return NextResponse.json({ error: "login" }, { status: 401 });
+    const orders = await fbGetOrders(user.telegramId);
     return NextResponse.json({ orders });
   }
 
@@ -57,165 +68,141 @@ export async function GET(req: NextRequest) {
   }
 
   if (action === "qr") {
-    if (!user) return NextResponse.json({ error: "login required" }, { status: 401 });
-    const amount = Number(req.nextUrl.searchParams.get("amount") || 50000);
-    const content = `NAP ${user.telegramId || user.username}`;
-    const qr = await generateVietQR(Math.max(10000, amount), content);
+    if (!user) return NextResponse.json({ error: "login" }, { status: 401 });
+    const amount = Math.max(10000, Number(req.nextUrl.searchParams.get("amount") || 50000));
+    const content = `NAP ${user.telegramId}`;
+    const qr = await generateVietQR(amount, content);
     const bank = await getBankInfo();
-    return NextResponse.json({ qr, bank, content, amount: Math.max(10000, amount) });
-  }
-
-  if (action === "check_gold") {
-    // Ưu tiên proxy locketuser.com (giống site gốc)
-    const username = req.nextUrl.searchParams.get("user") || "";
-    if (!username) return NextResponse.json({ error: "missing user" }, { status: 400 });
-    try {
-      const r = await fetch(
-        `${req.nextUrl.origin}/api/customer/check?u=${encodeURIComponent(username)}`,
-        { cache: "no-store" }
-      );
-      const data = await r.json();
-      if (data && (data.success !== undefined || data.username || data.name)) {
-        return NextResponse.json(data);
-      }
-    } catch { /* fallback */ }
-    const info = await checkGoldLive(username);
-    return NextResponse.json(info);
+    return NextResponse.json({ qr, bank, content, amount });
   }
 
   return NextResponse.json({ error: "unknown" }, { status: 400 });
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUser(req);
-  if (!user) return NextResponse.json({ error: "login required" }, { status: 401 });
+  const user = await sessionUser(req);
+  if (!user) return NextResponse.json({ error: "login" }, { status: 401 });
 
   const body = await req.json();
-  const action = body.action;
+  if (body.action !== "buy") {
+    return NextResponse.json({ error: "unknown" }, { status: 400 });
+  }
 
-  if (action === "buy") {
-    const productId = String(body.productId || "");
-    let customerInput = String(body.customerInput || body.locketUser || "").trim();
-    // Parse link locket.cam/@user như site gốc
-    const um = customerInput.match(/(?:locket\.cam\/|@)([a-zA-Z0-9_]+)/i);
-    if (um) customerInput = um[1];
-    const qty = Math.max(1, Number(body.qty) || 1);
-    const discountCode = body.discountCode ? String(body.discountCode) : null;
+  const productId = String(body.productId || "");
+  let customerInput = String(body.customerInput || body.locketUser || "").trim();
+  const qty = Math.max(1, Number(body.qty) || 1);
+  const discountCode = body.discountCode ? String(body.discountCode) : null;
 
-    const product = await getProductById(productId);
-    if (!product) return NextResponse.json({ error: "Sản phẩm không tồn tại" }, { status: 400 });
-    if ((product.stock ?? -1) === 0) {
-      return NextResponse.json({ error: "Hết hàng" }, { status: 400 });
+  const um = customerInput.match(/(?:locket\.cam\/|@)([a-zA-Z0-9_]+)/i);
+  if (um) customerInput = um[1];
+
+  if (!customerInput) {
+    return NextResponse.json({ error: "Nhập username Locket" }, { status: 400 });
+  }
+
+  const product = await fbGetProduct(productId);
+  if (!product) {
+    return NextResponse.json({ error: "Sản phẩm không tồn tại" }, { status: 400 });
+  }
+
+  const unitPrice = displayPrice(product, user);
+  let total = unitPrice * qty;
+  let discountPercent = 0;
+
+  if (discountCode) {
+    const d = await fbGetDiscount(discountCode);
+    if (!d) {
+      return NextResponse.json({ error: "Mã giảm giá không tồn tại" }, { status: 400 });
     }
-
-    const unitPrice = await getProductEffectivePrice(productId, user);
-    let discountAmount = 0;
-    if (discountCode) {
-      const d = await getDiscount(discountCode);
-      if (!d || (d.used || 0) >= (d.max_uses || 0)) {
-        return NextResponse.json({ error: "Mã giảm giá không hợp lệ" }, { status: 400 });
-      }
-      if (d.type === "percent") discountAmount = Math.floor((unitPrice * qty * d.value) / 100);
-      else discountAmount = Math.min(d.value, unitPrice * qty);
+    const data = d as { discountPercent?: number; validUntil?: { toDate?: () => Date } };
+    if (data.validUntil?.toDate && data.validUntil.toDate() < new Date()) {
+      return NextResponse.json({ error: "Mã đã hết hạn" }, { status: 400 });
     }
-    const total = Math.max(0, unitPrice * qty - discountAmount);
+    discountPercent = Number(data.discountPercent) || 0;
+    total = Math.round(total * (1 - discountPercent / 100));
+  }
 
-    if ((user.walletBalance || 0) < total) {
-      return NextResponse.json(
-        { error: "Số dư không đủ", need: total, balance: user.walletBalance },
-        { status: 400 }
-      );
-    }
+  const balance = user.walletBalance || 0;
+  if (balance < total) {
+    return NextResponse.json(
+      { error: "Số dư không đủ", need: total, balance },
+      { status: 400 }
+    );
+  }
 
-    if (product.stock !== -1) {
-      const st = await changeProductStock(productId, -qty);
-      if (st === false) return NextResponse.json({ error: "Hết hàng" }, { status: 400 });
-    }
+  // Trừ tiền
+  await fbUpdateUser(user.telegramId, { walletBalance: balance - total });
 
-    const newBal = (user.walletBalance || 0) - total;
-    await updateUserBalance(user.id, newBal);
-    await addTransaction({
-      userId: user.id,
-      type: "order",
-      amount: -total,
-      note: `Mua ${product.name} x${qty} - ${customerInput}`,
-      balanceAfter: newBal,
-    });
+  const orderId = "ORD-" + Date.now();
+  let status = "success";
+  let activateMsg = "";
 
-    const orderId = generateOrderId();
-    await createOrder({
-      orderId,
-      userId: user.id,
-      productId,
-      productName: product.name,
-      qty,
-      customerInput,
-      price: unitPrice,
-      discountCode,
-      discountAmount,
-      totalAmount: total,
-      status: "processing",
-      source: "web",
-    });
-    if (discountCode) await useDiscount(discountCode);
-
-    let activateMsg = "";
-    const isLocket =
-      productId.includes("locket") || product.name.toLowerCase().includes("locket");
-    if (isLocket && customerInput) {
+  const isGold = product.isGold || productId.includes("gold") || (product.name || "").toLowerCase().includes("gold");
+  if (isGold) {
+    try {
       const r = await callLocketApi(customerInput);
       if (r.ok) {
-        await updateOrderStatus(orderId, "success");
-        activateMsg = r.message;
+        activateMsg = r.message || "Kích hoạt thành công";
+        status = "success";
       } else {
-        await addBalance(user.id, total, "refund", "Hoàn " + orderId);
-        if (product.stock !== -1) await changeProductStock(productId, qty);
-        await updateOrderStatus(orderId, "failed");
+        // hoàn tiền
+        await fbUpdateUser(user.telegramId, { walletBalance: balance });
+        status = "failed";
+        activateMsg = r.message || "Kích hoạt thất bại";
+        await fbCreateOrder({
+          telegramId: user.telegramId,
+          orderId,
+          productId,
+          productName: product.name,
+          qty,
+          customerInput,
+          totalAmount: total,
+          status: "failed",
+          ctvPriceUsed: unitPrice,
+        });
         return NextResponse.json({
           ok: false,
-          error: "Kích hoạt thất bại: " + r.message + " (đã hoàn tiền)",
+          error: "Kích hoạt thất bại: " + activateMsg + " (đã hoàn tiền)",
           orderId,
         });
       }
-    } else if (product.api_order_enabled && product.api_url && product.api_key) {
-      const r = await callOrderApi(product.api_url, product.api_key, {
-        product_id: product.id,
-        username: customerInput,
-        order_id: orderId,
-        amount: total,
-        qty,
-      });
-      if (r.success) await updateOrderStatus(orderId, "success");
-      else {
-        await updateOrderStatus(orderId, "failed");
-        activateMsg = r.message || "";
-      }
-    } else {
-      await updateOrderStatus(orderId, "success");
+    } catch (e) {
+      activateMsg = String(e);
     }
-
-    const fresh = await getUserById(user.id);
-    return NextResponse.json({
-      ok: true,
-      success: true,
-      orderId,
-      total,
-      balance: fresh?.walletBalance ?? newBal,
-      message: activateMsg || "Đặt hàng thành công",
-      bill: {
-        statusHeader: "Đơn hàng đã được xác nhận",
-        orderId,
-        contentCK: "LK" + String(orderId).replace(/^LD/, "").replace(/^ORD-/, ""),
-        createdAt: new Date().toLocaleString("vi-VN"),
-        productName: product.name,
-        qty,
-        total,
-        unitPrice: unitPrice,
-        customerInput,
-        footerMsg: activateMsg || "Đơn hàng đang xử lý / đã ghi nhận",
-      },
-    });
   }
 
-  return NextResponse.json({ error: "unknown action" }, { status: 400 });
+  await fbCreateOrder({
+    telegramId: user.telegramId,
+    orderId,
+    productId,
+    productName: product.name,
+    qty,
+    customerInput,
+    totalAmount: total,
+    status,
+    ctvPriceUsed: unitPrice,
+    discountCode: discountCode || null,
+  });
+
+  const fresh = await fbGetUser(user.telegramId);
+  return NextResponse.json({
+    ok: true,
+    success: true,
+    orderId,
+    total,
+    balance: fresh?.walletBalance ?? balance - total,
+    message: activateMsg || "Đặt hàng thành công",
+    bill: {
+      statusHeader: "Đơn hàng đã được xác nhận",
+      orderId,
+      contentCK: "LK" + orderId.replace("ORD-", ""),
+      createdAt: new Date().toLocaleString("vi-VN"),
+      productName: product.name,
+      qty,
+      total,
+      unitPrice,
+      customerInput,
+      footerMsg: activateMsg || "Đơn hàng đã ghi nhận",
+    },
+  });
 }

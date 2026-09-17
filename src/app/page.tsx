@@ -2,85 +2,102 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/90 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-          <Link href="/" className="flex items-center gap-2 min-w-0 shrink">
-            <div className="w-8 h-8 rounded-lg bg-[var(--accent)] flex items-center justify-center shrink-0">
-              <span className="text-sm font-bold text-black">LG</span>
+    <div className="min-h-screen bg-[#0c0c0e] text-white">
+      {/* Nav */}
+      <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0c0c0e]/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-sm font-bold text-black">
+              LG
             </div>
-            <span className="font-semibold text-[15px] truncate hidden xs:inline sm:inline">
+            <span className="text-sm font-semibold tracking-tight sm:text-base">
               Locket Gold VIP
             </span>
-          </Link>
-          <div className="flex items-center gap-2 shrink-0">
-            <Link href="/app" className="btn btn-ghost text-sm px-3 py-2 hidden sm:inline-flex">
-              Vào App
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/app?mode=login"
+              className="rounded-full px-3.5 py-2 text-sm text-zinc-300 transition hover:bg-white/5 hover:text-white"
+            >
+              Đăng nhập
             </Link>
-            <Link href="/login" className="btn btn-ghost text-sm px-3 py-2">
-              Admin
-            </Link>
-            <Link href="/register-ctv" className="btn btn-primary text-sm px-3 sm:px-4 py-2">
-              Đăng ký CTV
+            <Link
+              href="/app?mode=register"
+              className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-sm font-semibold text-black shadow-lg shadow-amber-500/20 transition hover:opacity-90"
+            >
+              Đăng ký
             </Link>
           </div>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="flex-1 flex flex-col items-center justify-center px-4 py-16 sm:py-20 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border)] text-xs text-[var(--text-secondary)] mb-6">
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] shrink-0" />
-          Hệ thống đang hoạt động
-        </div>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight max-w-2xl leading-tight px-2">
-          Bán Locket Gold
-          <br />
-          <span className="text-[var(--accent)]">tự động qua Zalo</span>
-        </h1>
-        <p className="mt-5 text-[var(--text-secondary)] max-w-lg text-sm sm:text-[15px] leading-relaxed px-2">
-          Quản lý đơn hàng, CTV, thanh toán ngân hàng và kích hoạt Gold tự động.
-          Website + Zalo Bot đồng bộ real-time.
-        </p>
-        <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full max-w-xs sm:max-w-none px-2">
-          <Link href="/register-ctv" className="btn btn-primary px-6 py-3">
-            Đăng ký làm CTV
-          </Link>
-          <Link href="/login" className="btn btn-secondary px-6 py-3">
-            Vào Admin
-          </Link>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="border-t border-[var(--border)] py-12 sm:py-16 px-4">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-center text-lg sm:text-xl font-semibold mb-8 sm:mb-10">Tính năng chính</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {[
-              { title: "Zalo Bot", desc: "Nhận lệnh mua, list sản phẩm, check Gold, gửi QR thanh toán tự động." },
-              { title: "Thanh toán", desc: "Tích hợp Sepay / chuyển khoản. Cộng tiền ví ngay khi nhận được." },
-              { title: "Hệ thống CTV", desc: "Đăng ký, duyệt, giá riêng theo CTV, theo dõi hoa hồng." },
-              { title: "Admin Dashboard", desc: "Quản lý đơn, user, sản phẩm, mã giảm giá, cài đặt API." },
-              { title: "Kích hoạt API", desc: "Gọi API Locket Gold tự động sau khi thanh toán thành công." },
-              { title: "Bảo mật", desc: "Rate limit, validation, role-based access, audit log." },
-            ].map((f) => (
-              <div key={f.title} className="card p-4 sm:p-5">
-                <h3 className="font-medium text-[15px] mb-1.5">{f.title}</h3>
-                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
+      <main className="mx-auto max-w-5xl px-4 pb-20 pt-14 sm:px-6 sm:pt-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            Kích hoạt Locket Gold nhanh
+          </div>
+          <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-5xl sm:leading-[1.15]">
+            Mua Locket Gold
+            <br />
+            <span className="bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">
+              đơn giản &amp; nhanh chóng
+            </span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-zinc-400 sm:text-base">
+            Chọn gói, nhập username, thanh toán bằng số dư. Hỗ trợ giá CTV và nạp tiền tự động qua chuyển khoản.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/app"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 text-sm font-semibold text-black shadow-xl shadow-amber-500/25 transition hover:opacity-90"
+            >
+              Vào cửa hàng
+              <span aria-hidden>→</span>
+            </Link>
+            <Link
+              href="/app?mode=register"
+              className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-zinc-200 transition hover:bg-white/10"
+            >
+              Tạo tài khoản
+            </Link>
           </div>
         </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--border)] py-6 px-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between text-xs text-[var(--text-muted)]">
-          <span>Locket Gold VIP</span>
-          <span>© 2026</span>
+        {/* Feature cards */}
+        <div className="mt-16 grid gap-4 sm:grid-cols-3">
+          {[
+            {
+              t: "Mua nhanh",
+              d: "Chọn gói Gold, nhập username Locket và hoàn tất trong vài bước.",
+              i: "⚡",
+            },
+            {
+              t: "Nạp tự động",
+              d: "Chuyển khoản đúng nội dung — hệ thống cộng tiền vào ví của bạn.",
+              i: "💳",
+            },
+            {
+              t: "Hỗ trợ CTV",
+              d: "Tài khoản CTV / đại lý được áp giá riêng khi mua hàng.",
+              i: "🤝",
+            },
+          ].map((f) => (
+            <div
+              key={f.t}
+              className="rounded-2xl border border-white/5 bg-white/[0.03] p-5 transition hover:border-amber-500/20 hover:bg-white/[0.05]"
+            >
+              <div className="mb-3 text-2xl">{f.i}</div>
+              <h3 className="text-sm font-semibold text-white">{f.t}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-zinc-400">{f.d}</p>
+            </div>
+          ))}
         </div>
+      </main>
+
+      <footer className="border-t border-white/5 py-6 text-center text-xs text-zinc-600">
+        Locket Gold VIP
       </footer>
     </div>
   );
